@@ -1,0 +1,16 @@
+services:
+  selenium-tool:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: linzaixian/selenium-tool:latest
+    container_name: selenium-tool
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      SE_VNC_PASSWORD: selenium
+    volumes:
+      - ./config:/app/config
+    ports:
+      - "7900:7900"
+      - "8080:8080"
