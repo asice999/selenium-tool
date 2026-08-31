@@ -10,7 +10,7 @@ spring:
       # 代理和目标站点配置已拆分到 custom.yml，方便单独修改
       # JAR 同级目录放置同名文件可覆盖 classpath 中的默认值
       - "classpath:custom.yml"
-      - "optional:file:./config/custom.yml"
+      - "optional:file:/app/config/custom.yml"
 # 自动化任务主配置
 automation:
   # Web 页面保存的目标配置文件；相对路径相对于应用工作目录
@@ -33,7 +33,8 @@ automation:
     page-stay-seconds: 3
     # 页面加载超时时间
     page-load-timeout: 2m
-    driver-path:
+    driver-path: /usr/bin/chromedriver
+    binary-path: /usr/bin/google-chrome
     # 额外的浏览器启动参数
     arguments:
       - "--window-size=1400,900"
