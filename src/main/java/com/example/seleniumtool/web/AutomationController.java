@@ -1,9 +1,10 @@
 package com.example.seleniumtool.web;
 
 import com.example.seleniumtool.config.AutomationProperties;
-import com.example.seleniumtool.service.BrowserAutomationService.BatchRetrySubmission;
 import com.example.seleniumtool.service.BrowserAutomationService;
+import com.example.seleniumtool.service.BrowserAutomationService.BatchRetrySubmission;
 import com.example.seleniumtool.service.BrowserAutomationService.ExecutionRequestResult;
+import com.example.seleniumtool.service.MoviePilotImportService;
 import com.example.seleniumtool.service.TargetConfigurationService;
 import com.example.seleniumtool.service.TargetRunHistoryService;
 import com.example.seleniumtool.service.TargetRunHistoryService.TargetRunRecord;
@@ -19,10 +20,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/automation")
@@ -32,18 +34,21 @@ public class AutomationController {
     private final TargetConfigurationService targetConfigurationService;
     private final TargetRunHistoryService targetRunHistoryService;
     private final TargetTemplateService targetTemplateService;
+    private final MoviePilotImportService moviePilotImportService;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public AutomationController(
             BrowserAutomationService browserAutomationService,
             TargetConfigurationService targetConfigurationService,
             TargetRunHistoryService targetRunHistoryService,
-            TargetTemplateService targetTemplateService
+            TargetTemplateService targetTemplateService,
+            MoviePilotImportService moviePilotImportService
     ) {
         this.browserAutomationService = browserAutomationService;
         this.targetConfigurationService = targetConfigurationService;
         this.targetRunHistoryService = targetRunHistoryService;
         this.targetTemplateService = targetTemplateService;
+        this.moviePilotImportService = moviePilotImportService;
     }
 
     /**
@@ -134,9 +139,14 @@ public class AutomationController {
 
     @PutMapping("/targets")
     public List<AutomationProperties.Target> saveTargets(
-            @Valid @org.springframework.web.bind.annotation.RequestBody List<AutomationProperties.Target> targets
+            @Valid @RequestBody List<AutomationProperties.Target> targets
     ) {
         return targetConfigurationService.saveTargets(targets);
+    }
+
+    @PostMapping("/import/moviepilot")
+    public ResponseEntity<Map<String, Object>> importFromMoviePilot() {
+        return ResponseEntity.ok(Map.of("files", moviePilotImportService.importFiles()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
